@@ -841,20 +841,23 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
 // porque en ese caso no es necesario
 // si se quiere añadir hay que almacenarlo en la lista y son tres lineas de codigos por cada una
 			int ln=listProd.stream()
-					.map(Producto::getNombre)
-					.max(comparingInt(String::length)).map(String::length).get();
+					.map(p->p.getNombre().length())
+					.max(Integer::compareTo)
+					.orElse(0);
 
 			int lp=listProd.stream()
-					.map(p ->p.getPrecio()+"")
-					.max(comparingInt(String::length)).map(String::length).get();
+					.map(p ->(p.getPrecio()+"").length() )
+					.max(Integer::compareTo)
+					.orElse(0);
 
 			int lf=listProd.stream()
-					.map(p ->p.getFabricante().getNombre())
-					.max(comparingInt(String::length)).map(String::length).get();
+					.map(p ->p.getFabricante().getNombre().length())
+					.max(Integer::compareTo)
+					.orElse(0);
 
 			System.out.println(String.format("%1$-"+(ln+1)+"s","Producto")
 					+String.format("%1$-"+(lp+1)+"s","Precio")
-					+String.format("%1$-"+(lf+1)+"s","Fabricante"));
+					+String.format("%1$-"+(lf)+"s","Fabricante"));
 			//+2 por 2"|"
 			System.out.println("-".repeat(ln+lp+lf+2));
 
@@ -875,7 +878,7 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
 	}
 	
 	/**
-	 * 28. Devuelve un listado de los nombres fabricantes que existen en la base de datos, junto con los nombres productos que tiene cada uno de ellos. 
+	 * 28. Devuelve un listado de los nombres fabricantes que existen en la base de datos, junto con los nombres productos que tiene cada uno de ellos.
 	 * El listado deberá mostrar también aquellos fabricantes que no tienen productos asociados. 
 	 * SÓLO SE PUEDEN UTILIZAR STREAM, NO PUEDE HABER BUCLES
 	 * La salida debe queda como sigue:
@@ -939,7 +942,12 @@ Fabricante: Xiaomi
 			List<Fabricante> listFab = fabHome.findAll();
 					
 			//TODO STREAMS
-								
+			listFab.stream()
+					.map(f -> "Fabricante: "+f.getNombre()+"\n\n\tProductos:\n"+
+							f.getProductos().stream()
+									.map(p -> "\t"+p.getNombre()+"\n")
+									.collect(joining()))
+					.forEach(System.out::println);
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -962,7 +970,9 @@ Fabricante: Xiaomi
 			List<Fabricante> listFab = fabHome.findAll();
 					
 			//TODO STREAMS
-								
+			listFab.stream()
+					.filter(f-> f.getProductos().isEmpty())
+					.forEach(System.out::println);
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -984,7 +994,7 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream().count());
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1008,7 +1018,10 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream()
+					.map(Producto::getFabricante)
+					.distinct()
+					.count());
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1031,7 +1044,10 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(BigDecimal.valueOf(
+					listProd.stream()
+							.collect(averagingDouble(Producto::getPrecio)))
+					.setScale(2,RoundingMode.HALF_UP));
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1054,7 +1070,10 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream()
+							.map(Producto::getPrecio)
+							.min(Double::compareTo)
+							.orElse(0.0));
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1077,7 +1096,9 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream()
+					.mapToDouble(Producto::getPrecio)
+					.sum());
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1100,7 +1121,9 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream()
+					.filter(p->p.getFabricante().getNombre().equals("Asus"))
+					.count());
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1123,7 +1146,10 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			
+			System.out.println(BigDecimal.valueOf(listProd.stream()
+					.filter(p->p.getFabricante().getNombre().equals("Asus"))
+							.collect(averagingDouble(Producto::getPrecio)))
+					.setScale(2,RoundingMode.HALF_UP));
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1148,7 +1174,18 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();
 						
 			//TODO STREAMS
-			
+			System.out.println(listProd.stream()
+					.filter(p->p.getFabricante().getNombre().equals("Crucial"))
+					/*
+					con el reduce no me sale, problema: ya que hay 4 cosas
+					y me pide de usar un stream principal no puedo usar 4 reduce,
+					y si uso un reduce para los 4 tengo que devolver algo
+					pero el resultado del array no cambia y no puedo devolver un array.
+					He probado a empezar con Double[] convirtiendolo en Stream principal y hacer reduce
+					pero no tiene sentido y no lo veo posible ya que cada elemento pide una cosa diferente.
+					 */
+					.collect(summarizingDouble(Producto::getPrecio)));
+
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1189,7 +1226,20 @@ Hewlett-Packard              2
 			List<Fabricante> listFab = fabHome.findAll();
 				
 			//TODO STREAMS
-		
+			int lf=listFab.stream()
+					.map(f ->f.getNombre().length())
+					.max(Integer::compareTo)
+					.orElse(0);
+
+			System.out.println(String.format("%"+lf+"s","Fabricante")+
+					String.format("%"+lf+"s","Producto"));
+			System.out.println("-*".repeat(lf*2));
+
+			listFab.stream()
+					.sorted(comparing((Fabricante f)->f.getProductos().size()).reversed())
+					.map(f -> String.format("%"+lf+"s",f.getNombre())+
+							String.format("%"+lf+"s", f.getProductos().size()))
+					.forEach(System.out::println);
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
