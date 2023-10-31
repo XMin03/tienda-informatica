@@ -1264,7 +1264,6 @@ Hewlett-Packard              2
 			List<Fabricante> listFab = fabHome.findAll();
 				
 			//TODO STREAMS
-		
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
