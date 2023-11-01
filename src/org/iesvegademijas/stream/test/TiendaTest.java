@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 import static java.util.Comparator.*;
@@ -1352,13 +1349,14 @@ Hewlett-Packard              2
 						//el test37
 						Double[] res=f.getProductos().stream()
 							.map(p->new Double[]{p.getPrecio()})
-								.reduce(new Double[]{Double.MIN_VALUE,Double.MAX_VALUE,0.0,0.0},(d1, d2)->
-										new Double[]{
-											Math.max(d1[0], d2[0]),
-											Math.min(d1[1], d2[0]),
-											(d1[2]*d1[3]+d2[0])/(d1[3]+1),
-											d1[3]+1
-								});
+							.reduce(new Double[]{Double.MIN_VALUE,Double.MAX_VALUE,0.0,0.0},(d1, d2)->
+									new Double[]{
+										Math.max(d1[0], d2[0]),
+										Math.min(d1[1], d2[0]),
+										(d1[2]*d1[3]+d2[0])/(d1[3]+1),
+										d1[3]+1
+									}
+							);
 						//devolver resultado que hay que imprimir
 						String resultado= "Fabricante: "+f.getNombre();
 						//para que no salga MIN/MAX _value cuando no tienen producto
@@ -1397,12 +1395,14 @@ Hewlett-Packard              2
 						//igual que el test 37
 						Double[] res=f.getProductos().stream()
 							.map(p->new Double[]{p.getPrecio()})
-								.reduce(new Double[]{Double.MIN_VALUE,Double.MAX_VALUE,0.0,0.0},(d1, d2)->new Double[]{
+							.reduce(new Double[]{Double.MIN_VALUE,Double.MAX_VALUE,0.0,0.0},(d1, d2)->
+									new Double[]{
 										Math.max(d1[0], d2[0]),
 										Math.min(d1[1], d2[0]),
 										(d1[2]*d1[3]+d2[0])/(d1[3]+1),
-										d1[3]+1}
-								);
+										d1[3]+1
+									}
+							);
 						//preparar el resultado
 						String resultado="";
 						//comprobar la media mayor 200
