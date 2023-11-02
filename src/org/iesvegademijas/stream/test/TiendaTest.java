@@ -13,6 +13,7 @@ import org.iesvegademijas.hibernate.Fabricante;
 import org.iesvegademijas.hibernate.FabricanteHome;
 import org.iesvegademijas.hibernate.Producto;
 import org.iesvegademijas.hibernate.ProductoHome;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
@@ -1038,7 +1039,7 @@ Fabricante: Xiaomi
 						
 			//TODO STREAMS
 			//contar (lo mismo que size sin stream)
-			System.out.println(listProd.stream().count());
+			Assertions.assertEquals(11,listProd.stream().count());
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -1062,7 +1063,7 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			System.out.println(listProd.stream()
+			Assertions.assertEquals(7,listProd.stream()
 					//obtener los fabricantes
 					.map(Producto::getFabricante)
 					//qutiar repetido
@@ -1092,10 +1093,10 @@ Fabricante: Xiaomi
 						
 			//TODO STREAMS
 			//convertir el resultado en bigddecimal para redondear
-			System.out.println(BigDecimal.valueOf(
-					listProd.stream()
-							//obtener la media
-							.collect(averagingDouble(Producto::getPrecio)))
+			Assertions.assertEquals(BigDecimal.valueOf(271.72),BigDecimal.valueOf(
+							listProd.stream()
+									//obtener la media
+									.collect(averagingDouble(Producto::getPrecio)))
 					//redondear a dos decimales
 					.setScale(2,RoundingMode.HALF_UP));
 			prodHome.commitTransaction();
@@ -1120,7 +1121,7 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			System.out.println(listProd.stream()
+			Assertions.assertEquals(59.99,listProd.stream()
 					//obtener el precio
 					.map(Producto::getPrecio)
 					//obtener el mas barato
@@ -1149,7 +1150,7 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			System.out.println(listProd.stream()
+			Assertions.assertEquals(2988.96,listProd.stream()
 					//mapear a double
 					.mapToDouble(Producto::getPrecio)
 					//suma
@@ -1176,7 +1177,7 @@ Fabricante: Xiaomi
 			List<Producto> listProd = prodHome.findAll();		
 						
 			//TODO STREAMS
-			System.out.println(listProd.stream()
+			Assertions.assertEquals(2,listProd.stream()
 					//obtener productos con fabricante asus
 					.filter(p->p.getFabricante().getNombre().equals("Asus"))
 					//contar
@@ -1204,11 +1205,11 @@ Fabricante: Xiaomi
 						
 			//TODO STREAMS
 			//imprimir y convertir el resultado en big decimal para redondear
-			System.out.println(BigDecimal.valueOf(listProd.stream()
-					//filtrar Asus
-						.filter(p->p.getFabricante().getNombre().equals("Asus"))
-					//calcular la media
-						.collect(averagingDouble(Producto::getPrecio)))
+			Assertions.assertEquals(new BigDecimal("224.00"),BigDecimal.valueOf(listProd.stream()
+							//filtrar Asus
+							.filter(p->p.getFabricante().getNombre().equals("Asus"))
+							//calcular la media
+							.collect(averagingDouble(Producto::getPrecio)))
 					//redondear
 					.setScale(2,RoundingMode.HALF_UP));
 			prodHome.commitTransaction();
