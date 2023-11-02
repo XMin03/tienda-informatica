@@ -1392,30 +1392,20 @@ Hewlett-Packard              2
 			//TODO STREAMS
 			listFab.stream()
 					.map(f->{
-						//igual que el test 37
-						Double[] res=f.getProductos().stream()
-							.map(p->new Double[]{p.getPrecio()})
-							.reduce(new Double[]{Double.MIN_VALUE,Double.MAX_VALUE,0.0,0.0},(d1, d2)->
-									new Double[]{
-										Math.max(d1[0], d2[0]),
-										Math.min(d1[1], d2[0]),
-										(d1[2]*d1[3]+d2[0])/(d1[3]+1),
-										d1[3]+1
-									}
-							);
+						//ya que el ununciado no pide de hacerlo con reduce se hace con summarizingDouble
+						//seria igual que el test anterior si se quiere hacer con reduce
+						DoubleSummaryStatistics res=f.getProductos().stream()
+								.collect(summarizingDouble(Producto::getPrecio));
 						//preparar el resultado
 						String resultado="";
 						//comprobar la media mayor 200
-						if (res[2]>200){
+						if (res.getAverage()>200){
 							//rellenar el resultado
 							resultado+="Fabricante: "+f.getCodigo();
-							//seguro van a tener algun producto
-							//entonces no hace falta la ternaria
-							resultado+="\n\tMax: "+res[0];
-							resultado+="\n\tMin: "+res[1];
-							resultado+="\n\tAvg: "+res[2];
-							resultado+="\n\tCount: "+res[3]+"\n";
-
+							resultado+="\n\tMax: "+res.getMax();
+							resultado+="\n\tMin: "+res.getMin();
+							resultado+="\n\tAvg: "+res.getAverage();
+							resultado+="\n\tCount: "+res.getCount()+"\n";//cambio de linea manual, para que no salga lineas vacías.
 						}
 						return resultado;
 					}).forEach(System.out::print);
